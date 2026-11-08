@@ -1,0 +1,13 @@
+{
+  "name": "video-clipper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "YouTube clipper: cut a range, transcribe, burn karaoke captions into a 9:16 clip",
+  "scripts": {
+    "setup": "brew list ffmpeg-full >/dev/null 2>&1 || brew install ffmpeg-full; [ -d .venv ] || /opt/homebrew/bin/python3.14 -m venv .venv; .venv/bin/pip install -r requirements.txt",
+    "dev": ".venv/bin/uvicorn app:app --reload --port 8000",
+    "start": ".venv/bin/uvicorn app:app --port 8000",
+    "test": ".venv/bin/pytest -q",
+    "clean": "rm -rf jobs"
+  }
+}
