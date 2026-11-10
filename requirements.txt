@@ -3,4 +3,5 @@ uvicorn
 yt-dlp
 faster-whisper
 opencv-python-headless<5
+edge-tts
 pytest

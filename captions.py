@@ -74,6 +74,7 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,Arial,84,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,6,2,2,60,60,420,1
+Style: Handle,Arial,42,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,2,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -94,3 +95,27 @@ def to_ass(lines) -> str:
         start = min(line["start"], words[0]["start"])
         out.append(f"Dialogue: 0,{_ass_time(start)},{_ass_time(line['end'])},Default,,0,0,0,,{' '.join(parts)}\n")
     return "".join(out)
+
+
+HOOK_HEADER = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Hook,Arial,112,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,7,3,5,90,90,0,1
+Style: Handle,Arial,42,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,2,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+YELLOW = "&H0012C3FF&"  # #FFC312 in ASS BGR order
+
+
+def hook_ass(text: str, duration: float) -> str:
+    """Centered hook title that pops in; text inside quotes ('x', "x", “x”) is highlighted yellow."""
+    body = re.sub(r"(['\"“‘])(.+?)(['\"”’])", lambda m: f"{{\\c{YELLOW}}}{m[1]}{m[2]}{m[3]}{{\\r}}", _clean(text.strip()))
+    anim = "{\\fad(150,200)\\fscx80\\fscy80\\t(0,220,\\fscx100\\fscy100)}"
+    return f"{HOOK_HEADER}Dialogue: 0,{_ass_time(0)},{_ass_time(duration)},Hook,,0,0,0,,{anim}{body}\n"

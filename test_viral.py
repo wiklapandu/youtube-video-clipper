@@ -27,7 +27,9 @@ def test_pick_subtitle_prefers_manual_then_orig_auto():
 
 def test_validate_clips():
     rows = validate_clips([{"start": 10, "end": 40, "title": " Hook ", "score": 150}], duration=100)
-    assert rows == [{"start": 10.0, "end": 40.0, "title": "Hook", "reason": "", "score": 100}]
+    assert rows == [{"start": 10.0, "end": 40.0, "title": "Hook", "reason": "", "score": 100, "hook": None}]
+    rows = validate_clips([{"start": 0, "end": 20, "title": "t", "hook": " Momen ketika dia bilang 'cukup' "}], 100)
+    assert rows[0]["hook"] == "Momen ketika dia bilang 'cukup'"
     with pytest.raises(ValueError, match="#0.*#1"):
         validate_clips([{"start": 10, "end": 12, "title": "pendek"}, {"start": 90, "end": 130, "title": "lewat"}], 100)
     with pytest.raises(ValueError):
@@ -45,4 +47,19 @@ def test_db_roundtrip(tmp_path, monkeypatch):
     assert video["clips"][0]["status"] == "error"
     assert db.get_clip(cid)["url"] == "https://youtu.be/x"
     with pytest.raises(ValueError):
-        db.set_clip(cid, start=0)
+        db.set_clip(cid, source="manual")
+
+
+def test_speak_falls_back_to_mac_voice(tmp_path, monkeypatch):
+    import edge_tts
+    import pipeline
+
+    def boom(*a, **k):
+        raise ConnectionError("offline")
+
+    calls = []
+    monkeypatch.setattr(edge_tts.Communicate, "save_sync", boom)
+    monkeypatch.setattr(pipeline, "_run", lambda cmd, cwd: calls.append(cmd))
+    audio, note = pipeline.speak(tmp_path, "halo", "gadis")
+    assert audio == "hook.aiff" and "ConnectionError" in note
+    assert calls[0][:3] == ["say", "-v", pipeline.MAC_VOICE]

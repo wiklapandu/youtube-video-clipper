@@ -70,19 +70,44 @@ def detect_centers(clip: Path, ffmpeg: str, iw: int, ih: int):
     return centers
 
 
-def crop_filter(clip: Path, ffmpeg: str, job_dir: Path) -> str:
-    """ffmpeg filter that crops a 9:16 window following the main face (writes reframe.cmd in job_dir)."""
+def probe(clip: Path) -> dict:
     cap = cv2.VideoCapture(str(clip))
-    iw, ih = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30
-    n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    info = {"iw": int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), "ih": int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+            "fps": cap.get(cv2.CAP_PROP_FPS) or 30, "n_frames": int(cap.get(cv2.CAP_PROP_FRAME_COUNT)), "centers": []}
     cap.release()
+    return info
+
+
+def analyze(clip: Path, ffmpeg: str) -> dict:
+    """probe() plus the main face's center x per sample (empty for vertical video)."""
+    info = probe(clip)
+    if crop_width(info["iw"], info["ih"]) < info["iw"]:
+        info["centers"] = detect_centers(clip, ffmpeg, info["iw"], info["ih"])
+    return info
+
+
+def follow_crop(info: dict, job_dir: Path) -> str:
+    """ffmpeg filter that crops a 9:16 window following the main face (writes reframe.cmd in job_dir)."""
+    iw, ih = info["iw"], info["ih"]
     cw = crop_width(iw, ih)
     if cw >= iw:  # already vertical: nothing to follow
         return "null"
-    xs = plan_track(detect_centers(clip, ffmpeg, iw, ih), iw, cw)
+    xs = plan_track(info["centers"], iw, cw)
     if not xs:
         return f"crop={cw}:{ih}"
-    n_frames = n_frames or int(len(xs) / SAMPLE_FPS * fps)
-    (job_dir / "reframe.cmd").write_text(sendcmd_script(xs, fps, n_frames))
+    n_frames = info["n_frames"] or int(len(xs) / SAMPLE_FPS * info["fps"])
+    (job_dir / "reframe.cmd").write_text(sendcmd_script(xs, info["fps"], n_frames))
     return f"sendcmd=f=reframe.cmd,crop@rf=w={cw}:h={ih}:x={xs[0]}:y=0"
+
+
+def static_crop(info: dict, aspect: float) -> str:
+    """Fixed crop with the given width/height ratio, centered on the average face position (else the middle)."""
+    iw, ih = info["iw"], info["ih"]
+    known = [c for c in info["centers"] if c is not None]
+    center = sum(known) / len(known) if known else iw / 2
+    if iw / ih > aspect:
+        w = min(iw, int(ih * aspect) // 2 * 2)
+        x = int(min(max(center - w / 2, 0), iw - w)) // 2 * 2
+        return f"crop={w}:{ih}:{x}:0"
+    h = min(ih, int(iw / aspect) // 2 * 2)
+    return f"crop={iw}:{h}:0:{(ih - h) // 4 * 2}"

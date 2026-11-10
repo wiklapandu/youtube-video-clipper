@@ -22,6 +22,7 @@ def validate_clips(clips, duration):
         try:
             start, end = float(c["start"]), float(c["end"])
             title, reason = str(c["title"]).strip(), str(c.get("reason", "")).strip()
+            hook = str(c.get("hook") or "").strip() or None
             score = int(c.get("score", 0))
         except (KeyError, TypeError, ValueError) as e:
             errors.append(f"#{i}: field salah/hilang ({e})")
@@ -32,9 +33,11 @@ def validate_clips(clips, duration):
             errors.append(f"#{i}: di luar durasi video ({duration}s)")
         elif not title:
             errors.append(f"#{i}: title kosong")
+        elif hook and len(hook) > 200:
+            errors.append(f"#{i}: hook maksimal 200 karakter")
         else:
             rows.append({"start": start, "end": min(end, duration or end), "title": title,
-                         "reason": reason, "score": max(0, min(score, 100))})
+                         "reason": reason, "score": max(0, min(score, 100)), "hook": hook})
     if errors:
         raise ValueError("; ".join(errors))
     return rows

@@ -51,7 +51,7 @@
   .hero p { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--y900); max-width: 640px; }
   .cmd { font-family: var(--mono); font-size: 14px; background: var(--y200); padding: 3px 8px; border-radius: 8px; color: var(--y950); }
   form { background: #fff; border-radius: 22px; padding: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
-  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--y900); }
+  .field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--y900); }
   input { height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: var(--y950); background: var(--y50);
     border: 1.5px solid var(--y200); border-radius: 14px; width: 100%; }
   input:focus { outline: none; border-color: var(--y500); box-shadow: 0 0 0 3px var(--y200); }
@@ -121,6 +121,42 @@
   .line.active { background: var(--y100); }
   .line.active button { color: var(--y950); font-weight: 700; }
   .line.active input { background: #fff; border-color: var(--y500); }
+  .hook-box { background: #fff; border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .hook-toggle { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; cursor: pointer; min-height: 32px; }
+  .hook-toggle input { width: 20px; height: 20px; margin: 0; accent-color: var(--y950); }
+  .hook-box input[type="text"]:disabled { opacity: .5; }
+  .hook-help { margin: 0; font-size: 13px; color: var(--y800); }
+  .voice-pick { display: flex; gap: 8px; flex-wrap: wrap; }
+  .voice-pick label { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px;
+    background: var(--y50); border: 1.5px solid var(--y100); font-size: 14px; font-weight: 600; color: var(--y900); cursor: pointer; }
+  .voice-pick input { width: 16px; height: 16px; margin: 0; accent-color: var(--y950); }
+  .voice-pick label:has(input:checked) { background: var(--y400); border-color: var(--y400); color: var(--y950); }
+  .voice-pick label:has(input:disabled) { opacity: .5; cursor: default; }
+  .box-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: 15px; min-height: 32px; }
+  .nudge { display: flex; gap: 6px; align-items: center; }
+  .nudge input { width: 7.5rem; text-align: center; }
+  .nudge .btn { padding: 0 12px; }
+  select { height: 48px; padding: 0 12px; font: inherit; font-size: 15px; color: var(--y950); background: var(--y50);
+    border: 1.5px solid var(--y200); border-radius: 14px; width: 100%; }
+  select:focus { outline: none; border-color: var(--y500); box-shadow: 0 0 0 3px var(--y200); }
+  .ins-list { display: flex; flex-direction: column; gap: 8px; }
+  .ins { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--y50); border-radius: 14px; padding: 10px 12px; }
+  .ins .ins-main { flex: 1 1 200px; min-width: 0; font-size: 14px; }
+  .ins .ins-main b { font-weight: 700; }
+  .ins .ins-sub { font-size: 12px; color: var(--y800); overflow-wrap: anywhere; }
+  .wm-frame { width: 63px; height: 112px; border-radius: 10px; object-fit: cover; box-shadow: 0 0 0 3px var(--y200); }
+  .wm-card { background: #fff; border: 1.5px solid var(--y100); border-radius: 32px; padding: 24px; margin-top: 8px;
+    display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+  .wm-preview { width: 112px; height: 112px; border-radius: 50%; background: var(--y100); flex: none;
+    display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 0 4px var(--y200); }
+  .wm-preview img { width: 100%; height: 100%; }
+  .wm-empty { font-size: 12px; font-weight: 600; color: var(--y800); text-align: center; padding: 8px; }
+  .wm-body { flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .wm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .wm-head h2 { font-size: 24px; font-weight: 800; }
+  .wm-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  .clip-hook { font-size: 14px; color: var(--y900); }
+  .clip-hook b { font-weight: 700; color: var(--y700); }
   .editor-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .editor-actions .btn { min-height: 52px; font-size: 16px; padding: 0 26px; }
 
@@ -168,7 +204,51 @@
     </header>
     <p id="status" role="status" style="margin-top:16px"></p>
 
-    <div class="list-head" style="margin:12px 0 20px">
+    <section class="wm-card" aria-labelledby="wm-title">
+      <div class="wm-preview" id="wm-badge-preview">
+        <img id="wm-logo" alt="Logo watermark" hidden>
+        <span id="wm-empty" class="wm-empty">Belum ada logo</span>
+      </div>
+      <div class="wm-preview" id="wm-frame-preview" style="border-radius:12px;width:72px;height:128px" hidden>
+        <img id="wm-frame" alt="Template bingkai" style="object-fit:cover" hidden>
+        <span id="wm-frame-empty" class="wm-empty">Belum ada bingkai</span>
+      </div>
+      <div class="wm-body">
+        <div class="wm-head">
+          <h2 id="wm-title">Watermark</h2>
+          <label class="hook-toggle"><input type="checkbox" id="wm-enabled"> Pakai di setiap render</label>
+        </div>
+        <div class="segmented" role="radiogroup" aria-label="Jenis watermark" id="wm-mode" style="align-self:start">
+          <button type="button" data-mode="badge" aria-pressed="true">Logo + handle</button>
+          <button type="button" data-mode="frame" aria-pressed="false">Bingkai 9:16</button>
+        </div>
+        <div class="wm-row" id="wm-frame-row" hidden>
+          <input type="file" id="wm-frame-file" accept="image/png,image/jpeg,image/webp" hidden>
+          <button type="button" class="btn soft" id="wm-frame-upload">Upload bingkai</button>
+          <button type="button" class="btn soft" id="wm-frame-remove" hidden>Hapus bingkai</button>
+          <p class="hook-help" style="flex:1 1 240px">Gambar tegak 1080×1920. Video landscape tampil di tengah (tinggi 608px, mulai y=656), caption di area bawah.</p>
+        </div>
+        <div class="wm-row" data-badge-only>
+          <input type="file" id="wm-file" accept="image/png,image/jpeg,image/webp" hidden>
+          <button type="button" class="btn soft" id="wm-upload">Upload logo</button>
+          <button type="button" class="btn soft" id="wm-remove" hidden>Hapus logo</button>
+          <label class="field" style="flex:1 1 220px">Teks handle
+            <input id="wm-handle" maxlength="40" placeholder="@akunkamu">
+          </label>
+        </div>
+        <div class="wm-row">
+          <div class="segmented" role="radiogroup" aria-label="Posisi watermark" id="wm-position" data-badge-only>
+            <button type="button" data-pos="tl" aria-pressed="true">Kiri atas</button>
+            <button type="button" data-pos="tr" aria-pressed="false">Kanan atas</button>
+            <button type="button" data-pos="bc" aria-pressed="false">Tengah bawah</button>
+          </div>
+          <button type="button" class="btn dark" id="wm-save">Simpan</button>
+        </div>
+        <p class="hook-help" id="wm-status">Logo dipotong bulat seperti foto profil. Berlaku untuk render berikutnya; klip lama: buka Edit caption lalu Render lagi.</p>
+      </div>
+    </section>
+
+    <div class="list-head" style="margin:28px 0 20px">
       <h2>Video kamu</h2>
       <div class="segmented" role="group" aria-label="Filter klip">
         <button type="button" data-filter="all" aria-pressed="true">Semua</button>
@@ -200,6 +280,61 @@
             <span class="pill-ai" id="editor-badge" style="font-size:12px;padding:5px 12px"></span>
             <h1 id="editor-title" style="margin-top:10px"></h1>
             <p class="sub">Benahi typo lalu render. Klik waktu untuk lompat; kosongkan baris untuk menghapusnya.</p>
+          </div>
+          <div class="hook-box">
+            <div class="box-title">Durasi klip <span class="range" id="range-len"></span></div>
+            <div class="wm-row">
+              <div class="field">Mulai
+                <div class="nudge">
+                  <button type="button" class="btn soft" data-nudge="r-start" data-step="-1" aria-label="Mulai mundur 1 detik">−1s</button>
+                  <input id="r-start" aria-label="Mulai">
+                  <button type="button" class="btn soft" data-nudge="r-start" data-step="1" aria-label="Mulai maju 1 detik">+1s</button>
+                </div>
+              </div>
+              <div class="field">Selesai
+                <div class="nudge">
+                  <button type="button" class="btn soft" data-nudge="r-end" data-step="-1" aria-label="Selesai mundur 1 detik">−1s</button>
+                  <input id="r-end" aria-label="Selesai">
+                  <button type="button" class="btn soft" data-nudge="r-end" data-step="1" aria-label="Selesai maju 1 detik">+1s</button>
+                </div>
+              </div>
+              <button type="button" class="btn soft" id="r-save">Simpan &amp; proses ulang</button>
+            </div>
+            <p class="hook-help">Waktu dihitung dari video YouTube asli. Mengubah durasi = download &amp; transkrip ulang (edit caption yang belum dirender hilang).</p>
+          </div>
+          <div class="hook-box">
+            <div class="box-title">Video tambahan</div>
+            <div id="ins-list" class="ins-list"></div>
+            <div class="wm-row">
+              <label class="field" style="flex:999 1 260px">Link YouTube
+                <input id="ins-url" type="url" placeholder="https://www.youtube.com/watch?v=...">
+              </label>
+              <label class="field" style="flex:1 1 90px">Mulai <input id="ins-start" placeholder="1:20"></label>
+              <label class="field" style="flex:1 1 90px">Selesai <input id="ins-end" placeholder="1:30"></label>
+            </div>
+            <div class="wm-row">
+              <label class="field" style="flex:1 1 200px">Tampil sebagai
+                <select id="ins-mode">
+                  <option value="split">Split (tambahan atas, utama 16:9 di bawah)</option>
+                  <option value="cutaway">Cutaway (ganti layar)</option>
+                  <option value="pip">Picture-in-picture</option>
+                  <option value="before">Sambung di awal</option>
+                  <option value="after">Sambung di akhir</option>
+                </select>
+              </label>
+              <label class="field" id="ins-at-wrap" style="flex:1 1 120px">Muncul di detik <input id="ins-at" placeholder="0:05"></label>
+              <button type="button" class="btn soft" id="ins-add">Tambah</button>
+            </div>
+            <p class="hook-help">Overlay (split, cutaway, PiP) tanpa suara, dihitung dari awal klip. Sambungan awal/akhir pakai suaranya sendiri. Maks 60 detik per video.</p>
+          </div>
+          <div class="hook-box">
+            <label class="hook-toggle"><input type="checkbox" id="use-hook"> Pakai hook di awal video</label>
+            <input type="text" id="hook-text" maxlength="200" aria-label="Teks hook" placeholder="Momen ketika ... bilang '...'">
+            <div class="voice-pick" role="radiogroup" aria-label="Suara hook">
+              <label><input type="radio" name="voice" value="ardi" checked> Ardi (pria)</label>
+              <label><input type="radio" name="voice" value="gadis"> Gadis (wanita)</label>
+            </div>
+            <p class="hook-help">Dibacakan suara AI (Edge TTS, perlu internet) di intro 2–4 detik sebelum klip. Beri tanda kutip '...' pada kata yang mau disorot kuning.</p>
           </div>
           <div class="lines" id="lines"></div>
           <div class="editor-actions">
@@ -263,6 +398,10 @@ function clipRow(c) {
       onclick: () => openEditor(c) }),
     c.status === "done" && h("a", { className: "btn soft", textContent: "Tonton", href: media("final.mp4"), target: "_blank" }),
     c.status === "done" && h("a", { className: "btn", textContent: "Download", href: media("final.mp4", true) }),
+    ["transcribed", "done"].includes(c.status) && h("button", { className: "btn soft", textContent: "Proses ulang",
+      title: "Download dan transkrip ulang dari awal",
+      onclick: () => confirm("Download dan transkrip ulang klip ini? Hasil render dan edit caption akan diganti.")
+        && act(() => api("POST", `/api/clips/${c.id}/prepare`)) }),
     busy && h("button", { className: "btn soft", textContent: "Sedang diproses", disabled: true }),
     !busy && h("button", { className: "btn soft icon", ariaLabel: "Hapus klip", title: "Hapus klip",
       onclick: () => confirm("Hapus klip ini?") && act(() => api("DELETE", `/api/clips/${c.id}`)) }, icon(TRASH)),
@@ -274,6 +413,7 @@ function clipRow(c) {
         h("span", { className: "range", textContent: `${fmt(c.start)}–${fmt(c.end)}` }),
         h("span", { className: `badge ${kind}`, textContent: LABEL[c.status] || c.status })),
       c.title && h("div", { className: "clip-title", textContent: c.title }),
+      c.hook && h("div", { className: "clip-hook" }, h("b", { textContent: "Hook: " }), c.hook),
       busy && h("div", { className: "bar", role: "presentation" }),
       !busy && c.reason && h("div", { className: "clip-note", textContent: c.reason }),
       c.message && h("div", { className: c.status === "error" ? "clip-note error" : "clip-note", textContent: c.message })),
@@ -294,6 +434,10 @@ function videoCard(v, clips) {
 }
 
 function render(videos) {
+  if (editing) {  // keep the open editor's extra-video list live
+    const clip = videos.flatMap((v) => v.clips).find((c) => c.id === editing);
+    if (clip) renderInserts(clip.inserts);
+  }
   const busyCount = videos.reduce((n, v) => n + (["transcribing", "analyzing"].includes(v.status) ? 1 : 0)
     + v.clips.filter((c) => BUSY.includes(c.status)).length, 0);
   $("run-dot").className = busyCount ? "dot on" : "dot";
@@ -330,6 +474,13 @@ async function openEditor(c) {
     $("editor-badge").textContent = c.source === "ai" ? `AI · skor ${c.score ?? 0}` : "Manual";
     $("editor-range").textContent = `${fmt(c.start)}–${fmt(c.end)} · ${Math.round(c.end - c.start)} detik`;
     $("preview").src = `/api/media/${c.id}/clip.mp4`;
+    $("r-start").value = fmtP(c.start);
+    $("r-end").value = fmtP(c.end);
+    updateRangeLen();
+    renderInserts(c.inserts || []);
+    $("hook-text").value = c.hook || "";
+    $("use-hook").checked = Boolean(c.hook);
+    setHookEnabled(Boolean(c.hook));
     $("lines").replaceChildren(...editLines.map((l) => {
       const input = h("input", { value: l.words.map((w) => w.word).join(" ") });
       input.setAttribute("aria-label", `Caption ${fmt(l.start)}`);
@@ -351,6 +502,23 @@ function closeEditor() {
   $("home").hidden = false;
   editing = null;
 }
+function setHookEnabled(on) {
+  $("hook-text").disabled = !on;
+  document.querySelectorAll('input[name="voice"]').forEach((r) => { r.disabled = !on; });
+}
+$("use-hook").onchange = () => {
+  setHookEnabled($("use-hook").checked);
+  if ($("use-hook").checked) $("hook-text").focus();
+};
+// remember the chosen voice in this browser only
+try {
+  const saved = localStorage.getItem("hookVoice");
+  const radio = saved && document.querySelector(`input[name="voice"][value="${saved === "gadis" ? "gadis" : "ardi"}"]`);
+  if (radio) radio.checked = true;
+} catch {}
+document.querySelectorAll('input[name="voice"]').forEach((r) => r.addEventListener("change", () => {
+  try { localStorage.setItem("hookVoice", r.value); } catch {}
+}));
 $("back").onclick = closeEditor;
 $("cancel").onclick = closeEditor;
 
@@ -363,7 +531,10 @@ $("preview").addEventListener("timeupdate", () => {
 
 $("render").onclick = () => act(async () => {
   const texts = [...$("lines").querySelectorAll("input")].map((i) => i.value);
-  await api("POST", `/api/clips/${editing}/render`, { texts });
+  const hook = $("use-hook").checked ? $("hook-text").value.trim() : "";
+  if ($("use-hook").checked && !hook) throw new Error("Isi teks hook atau matikan 'Pakai hook'.");
+  const voice = document.querySelector('input[name="voice"]:checked').value;
+  await api("POST", `/api/clips/${editing}/render`, { texts, hook: hook || null, voice });
   closeEditor();
   status("Render masuk antrian. Status ada di daftar klip.");
 });
@@ -375,6 +546,129 @@ $("form").addEventListener("submit", (e) => {
     status("Klip ditambahkan dan sedang diproses.");
   });
 });
+
+// ---------- clip range ----------
+const fmtP = (t) => {
+  const tenths = Math.round(t * 10) % 10;
+  return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}${tenths ? "." + tenths : ""}`;
+};
+function parseT(s) {
+  const parts = String(s).trim().split(":");
+  if (!parts[0] || parts.length > 3 || parts.some((p) => !/^\d+(\.\d+)?$/.test(p))) return null;
+  return parts.reduce((acc, p) => acc * 60 + Number(p), 0);
+}
+function updateRangeLen() {
+  const s = parseT($("r-start").value), e = parseT($("r-end").value);
+  $("range-len").textContent = s != null && e != null && e > s ? `${(e - s).toFixed(1)} detik` : "";
+}
+["r-start", "r-end"].forEach((id) => $(id).addEventListener("input", updateRangeLen));
+document.querySelectorAll("[data-nudge]").forEach((b) => b.addEventListener("click", () => {
+  const input = $(b.dataset.nudge);
+  const t = parseT(input.value);
+  if (t == null) return;
+  input.value = fmtP(Math.max(0, t + Number(b.dataset.step)));
+  updateRangeLen();
+}));
+$("r-save").onclick = () => act(async () => {
+  if (!confirm("Download & transkrip ulang dengan durasi baru?")) return;
+  await api("PATCH", `/api/clips/${editing}`, { start: $("r-start").value, end: $("r-end").value });
+  closeEditor();
+  status("Durasi diubah. Klip sedang didownload & ditranskrip ulang.");
+});
+
+// ---------- extra videos ----------
+const MODE_LABEL = { split: "Split atas-bawah", cutaway: "Cutaway", pip: "Picture-in-picture", before: "Sambung di awal", after: "Sambung di akhir" };
+const INS_STATUS = { queued: ["Antri…", "busy"], downloading: ["Download…", "busy"], ready: ["Siap", "done"], error: ["Error", "error"] };
+let lastInsJson = "";
+function renderInserts(list) {
+  const json = JSON.stringify(list);
+  if (json === lastInsJson) return;
+  lastInsJson = json;
+  $("ins-list").replaceChildren(...list.map((i) => {
+    const [label, kind] = INS_STATUS[i.status] || [i.status, ""];
+    const when = i.at != null ? ` · muncul di ${fmtP(i.at)}` : "";
+    return h("div", { className: "ins" },
+      h("div", { className: "ins-main" },
+        h("div", {}, h("b", { textContent: MODE_LABEL[i.mode] }), ` · ${fmtP(i.src_start)}–${fmtP(i.src_end)}${when}`),
+        i.message && h("div", { className: i.status === "error" ? "ins-sub error" : "ins-sub", textContent: i.message })),
+      h("span", { className: `badge ${kind}`, textContent: label }),
+      !["queued", "downloading"].includes(i.status) && h("button", { type: "button", className: "btn soft icon",
+        ariaLabel: "Hapus video tambahan", title: "Hapus video tambahan",
+        onclick: () => act(() => api("DELETE", `/api/inserts/${i.id}`)) }, icon(TRASH)));
+  }));
+  if (!list.length) $("ins-list").append(h("p", { className: "hook-help", textContent: "Belum ada video tambahan." }));
+}
+$("ins-mode").onchange = () => { $("ins-at-wrap").hidden = ["before", "after"].includes($("ins-mode").value); };
+$("ins-add").onclick = () => act(async () => {
+  const mode = $("ins-mode").value;
+  await api("POST", `/api/clips/${editing}/inserts`, { url: $("ins-url").value, start: $("ins-start").value,
+    end: $("ins-end").value, mode, at: ["before", "after"].includes(mode) ? null : ($("ins-at").value || "0") });
+  ["ins-start", "ins-end", "ins-at"].forEach((id) => { $(id).value = ""; });
+  status("Video tambahan sedang didownload. Render setelah statusnya Siap.");
+});
+
+// ---------- watermark settings ----------
+let wmPos = "tl", wmMode = "badge";
+function showMode() {
+  document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === wmMode)));
+  document.querySelectorAll("[data-badge-only]").forEach((el) => { el.hidden = wmMode !== "badge"; });
+  $("wm-badge-preview").hidden = wmMode !== "badge";
+  $("wm-frame-preview").hidden = $("wm-frame-row").hidden = wmMode !== "frame";
+}
+document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { wmMode = b.dataset.mode; showMode(); }));
+function showSettings(s) {
+  wmMode = s.watermark_mode;
+  $("wm-frame").hidden = !s.watermark_frame;
+  $("wm-frame-empty").hidden = Boolean(s.watermark_frame);
+  $("wm-frame-remove").hidden = !s.watermark_frame;
+  if (s.watermark_frame) $("wm-frame").src = s.watermark_frame;
+  $("wm-frame-upload").textContent = s.watermark_frame ? "Ganti bingkai" : "Upload bingkai";
+  showMode();
+  $("wm-enabled").checked = s.watermark_enabled;
+  $("wm-handle").value = s.watermark_handle;
+  wmPos = s.watermark_position;
+  document.querySelectorAll("[data-pos]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.pos === wmPos)));
+  $("wm-logo").hidden = !s.watermark_logo;
+  $("wm-empty").hidden = Boolean(s.watermark_logo);
+  $("wm-remove").hidden = !s.watermark_logo;
+  if (s.watermark_logo) $("wm-logo").src = s.watermark_logo;
+  $("wm-upload").textContent = s.watermark_logo ? "Ganti logo" : "Upload logo";
+}
+function wmStatus(text, isError = false) {
+  $("wm-status").textContent = text;
+  $("wm-status").className = isError ? "hook-help error" : "hook-help";
+}
+async function wmAct(fn, done) {
+  try { showSettings(await fn()); wmStatus(done); } catch (err) { wmStatus(err.message, true); }
+}
+document.querySelectorAll("[data-pos]").forEach((b) => b.addEventListener("click", () => {
+  wmPos = b.dataset.pos;
+  document.querySelectorAll("[data-pos]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
+function uploadImage(input, path, done) {
+  const file = input.files[0];
+  input.value = "";
+  if (!file) return;
+  wmAct(async () => {
+    const res = await fetch(path, { method: "POST", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
+    return data;
+  }, done);
+}
+$("wm-upload").onclick = () => $("wm-file").click();
+$("wm-file").onchange = () => uploadImage($("wm-file"), "/api/watermark", "Logo tersimpan. Berlaku untuk render berikutnya.");
+$("wm-remove").onclick = () => confirm("Hapus logo watermark?") && wmAct(() => api("DELETE", "/api/watermark"), "Logo dihapus.");
+$("wm-frame-upload").onclick = () => $("wm-frame-file").click();
+$("wm-frame-file").onchange = () => uploadImage($("wm-frame-file"), "/api/frame", "Bingkai tersimpan. Klik Simpan untuk memakai mode Bingkai.");
+$("wm-frame-remove").onclick = () => confirm("Hapus bingkai?") && wmAct(() => api("DELETE", "/api/frame"), "Bingkai dihapus.");
+$("wm-save").onclick = () => wmAct(async () => {
+  const saved = await api("PUT", "/api/settings", { watermark_enabled: $("wm-enabled").checked,
+    watermark_handle: $("wm-handle").value, watermark_position: wmPos, watermark_mode: wmMode });
+  if (saved.watermark_mode === "frame" && !saved.watermark_frame) throw new Error("Tersimpan, tapi belum ada bingkai: render memakai logo + handle sampai bingkai di-upload.");
+  return saved;
+}, "Pengaturan watermark tersimpan. Berlaku untuk render berikutnya.");
+api("GET", "/api/settings").then(showSettings).catch((err) => wmStatus(err.message, true));
 
 refresh();
 setInterval(() => refresh().catch(() => {}), 2000);

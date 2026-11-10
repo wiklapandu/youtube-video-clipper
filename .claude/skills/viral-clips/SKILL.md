@@ -37,13 +37,17 @@ For each clip write, in the video's language:
 - `title`: a short catchy hook title (max ~60 chars) usable as the TikTok caption.
 - `reason`: one sentence on why it can go viral.
 - `score`: 0–100, your honest estimate of viral potential.
+- `hook`: the line a voice-over reads on a 2–4 second title card BEFORE the clip plays. Max ~12 words, easy to say out loud, makes people stay to hear the answer, never gives away the payoff. Put the one key word in single quotes to highlight it in yellow. Patterns:
+  - "Momen ketika [nama] bilang '[kutipan singkat]'"
+  - "Rahasia '[kata kunci]' [topik]: [twist singkat]" (e.g. "Rahasia 'pintu' hak siar: jangan tanya broadcaster resmi")
+  - A question or bold claim the clip answers.
 
 ## 3. Save the candidates
 
 Write the clips as a JSON array to a temp file in the scratchpad (seconds as numbers):
 
 ```json
-[{"start": 754.5, "end": 801.0, "title": "...", "reason": "...", "score": 85}]
+[{"start": 754.5, "end": 801.0, "title": "...", "reason": "...", "score": 85, "hook": "..."}]
 ```
 
 ```bash

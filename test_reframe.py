@@ -26,3 +26,11 @@ def test_sendcmd_only_emits_changes():
     assert script.splitlines()[0] == "0.000 crop@rf x 100;"
     assert all(line.endswith(";") for line in script.splitlines())
     assert len(script.splitlines()) == 3  # frames 0 (100), 3 (150), 4 (200)
+
+
+def test_static_crop():
+    from reframe import static_crop
+    wide = {"iw": 1920, "ih": 1080, "centers": [None, 1700, 1800]}
+    assert static_crop(wide, 9 / 8) == "crop=1214:1080:706:0"  # follows the face, clamped to the right edge
+    assert static_crop({**wide, "centers": []}, 9 / 16) == "crop=606:1080:656:0"  # no face: middle
+    assert static_crop({"iw": 1080, "ih": 1920, "centers": []}, 16 / 9) == "crop=1080:606:0:656"  # tall source

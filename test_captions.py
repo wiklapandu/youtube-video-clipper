@@ -42,3 +42,10 @@ def test_to_ass_karaoke_durations_match_event():
     assert dialogue.startswith("Dialogue: 0,0:00:01.00,0:00:02.00,")
     assert sum(map(int, re.findall(r"\\k(\d+)", dialogue))) == 100
     assert dialogue.endswith("{\\k50}halo {\\k50}dunia")
+
+
+def test_hook_ass_highlights_quotes():
+    from captions import hook_ass
+    line = hook_ass("Rahasia 'pintu' hak siar: {jangan}", 3.2).splitlines()[-1]
+    assert line.startswith("Dialogue: 0,0:00:00.00,0:00:03.20,Hook,")
+    assert "{\\c&H0012C3FF&}'pintu'{\\r} hak siar: jangan" in line
